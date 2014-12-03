@@ -9,9 +9,11 @@ import (
 )
 
 func main() {
-    logger := log.New(os.Stdout, "[main]   ", log.LstdFlags)
+    logger := log.New(os.Stdout, "[main    ] ", log.LstdFlags)
+    logger.Println("loading configuration")
     config := config.LoadFromFile("bot.conf")
 
+    logger.Println("spawning new bot")
     bot, err := bot.New(config)
     if err != nil {
         logger.Printf("FATAL ERROR - unable to init IRC bot: %s\n", err)
@@ -27,6 +29,7 @@ func main() {
     quit := make(chan bool)
 
     go func() {
+        logger.Println("waiting for bot to quit")
         <- bot.Quitted
         logger.Println("bot decided to quit")
         quit <- true

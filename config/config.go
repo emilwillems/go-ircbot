@@ -15,6 +15,7 @@ type Config_IRC struct {
     UseSSL          bool
 
     AdminChannel    string
+    CommandChar     string
 
     Debug           bool
 }
@@ -28,7 +29,7 @@ type Config struct {
 func LoadFromFile(filename string) *Config {
     var conf Config
 
-    log := log.New(os.Stdout, "[config] ", log.LstdFlags)
+    log := log.New(os.Stdout, "[config  ] ", log.LstdFlags)
     log.Printf("reading configuration from %s\n", filename)
 
     file, err := ioutil.ReadFile(filename)

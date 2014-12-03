@@ -35,10 +35,9 @@ func (bot *Bot) Init() {
 }
 
 func New(cfg *config.Config) (*Bot, error) {
-
     client := irc.IRC(cfg.IRC.Nick, "go-ircbot")
     client.UseTLS = cfg.IRC.UseSSL
-    client.Log = log.New(os.Stdout, "[irc]    ", log.LstdFlags)
+    client.Log = log.New(os.Stdout, "[irc     ] ", log.LstdFlags)
 
     if cfg.IRC.Password != "" {
         client.Password = cfg.IRC.Password
@@ -62,6 +61,8 @@ func New(cfg *config.Config) (*Bot, error) {
 // default callbacks
 func (bot *Bot) JoinChannels(event *irc.Event) {
     time.Sleep(time.Second)    
+
+    bot.client.Log.Printf("%+v\n", event)
 
     // only join adminchannel for now
     bot.client.Join(bot.cfg.IRC.AdminChannel)

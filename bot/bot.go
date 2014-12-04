@@ -5,6 +5,8 @@ import (
     "log"
     "net"
     "time"
+    "strings"
+    "fmt"
 
     "../config"
 
@@ -32,6 +34,7 @@ func (bot *Bot) Connect() error {
 
 func (bot *Bot) Init() {
     bot.client.AddCallback("001", bot.JoinChannels)
+    bot.client.AddCallback("PRIVMSG", bot.RunDefaultCommands)
 }
 
 func New(cfg *config.Config) (*Bot, error) {
@@ -57,14 +60,43 @@ func New(cfg *config.Config) (*Bot, error) {
     return bot, nil
 }
 
+func (bot *Bot) IRCSay(channel, message string) {
+    bot.client.Privmsg(channel, message)
+}
 
-// default callbacks
+func (bot *Bot) IRCAction(channel, action string) {
+    bot.client.Privmsg(channel, fmt.Sprintf("\001ACTION %s\001", action))
+}
+
 func (bot *Bot) JoinChannels(event *irc.Event) {
     time.Sleep(time.Second)    
-
-    bot.client.Log.Printf("%+v\n", event)
-
-    // only join adminchannel for now
     bot.client.Join(bot.cfg.IRC.AdminChannel)
 }
 
+func (bot *Bot) RunDefaultCommands(event *irc.Event) {
+
+    //bot.client.Log.Printf("%+v\n", event)
+
+    // split message on space, grab first element, process args
+    args := strings.Split(strings.TrimSpace(event.Message()), " ")
+    command := args[0]
+    if len(args) > 1 {
+        args = args[1:]
+    } else {
+        args = []string{}
+    }
+
+    // only trigger on messages starting with our configured command character
+    if !strings.HasPrefix(command, bot.cfg.IRC.CommandChar) {
+        return 
+    }
+
+    command = strings.TrimPrefix(command, "?")
+    channel := event.Arguments[0]
+    switch command {
+        case "quit": 
+            bot.IRCSay(channel, "aye aye cap'n!")
+            bot.Quit()
+    }
+
+}

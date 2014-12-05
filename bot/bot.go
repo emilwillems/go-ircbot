@@ -60,11 +60,11 @@ func New(cfg *config.Config) (*Bot, error) {
     return bot, nil
 }
 
-func (bot *Bot) IRCSay(channel, message string) {
+func (bot *Bot) Say(channel, message string) {
     bot.client.Privmsg(channel, message)
 }
 
-func (bot *Bot) IRCAction(channel, action string) {
+func (bot *Bot) Action(channel, action string) {
     bot.client.Privmsg(channel, fmt.Sprintf("\001ACTION %s\001", action))
 }
 
@@ -74,7 +74,6 @@ func (bot *Bot) JoinChannels(event *irc.Event) {
 }
 
 func (bot *Bot) RunDefaultCommands(event *irc.Event) {
-
     //bot.client.Log.Printf("%+v\n", event)
 
     // split message on space, grab first element, process args
@@ -95,8 +94,7 @@ func (bot *Bot) RunDefaultCommands(event *irc.Event) {
     channel := event.Arguments[0]
     switch command {
         case "quit": 
-            bot.IRCSay(channel, "aye aye cap'n!")
+            bot.Say(channel, "aye aye cap'n!")
             bot.Quit()
     }
-
 }

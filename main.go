@@ -30,9 +30,11 @@ func main() {
 
     go func() {
         logger.Println("waiting for bot to quit")
-        <- bot.Quitted
-        logger.Println("bot decided to quit")
-        quit <- true
+        select {
+            case <- bot.Quitted:
+                logger.Println("bot decided to quit")
+                quit <- true
+        }
     }()
 
     <- quit
